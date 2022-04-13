@@ -1,5 +1,7 @@
 
 import UserInput from "./user-input"
+import './index.css';
+
 
 function typeLyrics() {
 

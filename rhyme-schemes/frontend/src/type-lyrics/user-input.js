@@ -1,16 +1,23 @@
 import { useEffect, useState, ChangeEvent } from 'react';
 import TextField from '@mui/material/TextField';
 import Box from '@mui/material/Box';
+import './index.css';
 
 let changes = 1
 let defText = ""
+let colors = ["red", "blue", "green"]
+
+function getRandomcolor(arr) {
+    return arr[Math.floor(Math.random() * arr.length)];
+  }
 
 function colorize(arr) {
     let res = []
     console.log(arr)
     for(let  i = 0; i<arr.length; i++){
         let text = arr[i]
-        res.push((<span style={{'color':'blue'}}>{text + " "}</span>))
+        let c = getRandomcolor(colors)
+        res.push((<span className='word' style={{'background-color': c}}>{text + " "}</span>))
     }
     return (<p>{res}</p>)
 }
@@ -40,7 +47,6 @@ const UserInput = () => {
                 <div className='col'>
                     <TextField
                     class="outlined-multiline-flexible col"
-                    // label="multiline"
                     multiline
                     minRows={4}
                     value={userInput}
