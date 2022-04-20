@@ -1,3 +1,11 @@
 .word {
-    color: white;
+    color: black;
+}
+
+.s1{
+    color: cyan;
+}
+
+.s0{
+    color: darkgray;
 }

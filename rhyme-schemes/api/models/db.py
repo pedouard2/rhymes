@@ -1,84 +1,76 @@
 import sqlite3
+from tkinter import W
 from sqlalchemy.sql.expression import except_all 
 import pandas as pd
-from sqlalchemy import create_engine, Table, Column, String, MetaData, select, UniqueConstraint
-import os
+from sqlalchemy import create_engine, Table, Column, Integer, String, MetaData, select, UniqueConstraint, ForeignKey
+from sqlalchemy.orm import declarative_base, relationship, Session
 
-class SQLAlchemyDB:
+DB = "bar.db"
 
-    def __init__(self, db_name):
-        self.db = db_name
-        self.metadata_obj = MetaData()
-        print(f"Creating engine for {self.db}")
-        try:
-            self._engine = create_engine(self.db)
-        except:
-            print("Unable to connect to db")
+Base = declarative_base()
 
-    def create_table(self, table_name, columns, constraints = []):
-        """
-        Creates a Table object within catalog of MetaData 
+class Sounds(Base):
+    __tablename__ = "sounds"
+    sound = Column(String, primary_key = True, unique = True)
+    color = Column(String, unique = True)
+    
+    def __repr__(self):
+        return f"Words(id={self.sound!r}, word={self.color!r})"
 
-        Params: {
-        table_name: String
-        column: List of Tuples in form ("column name", DataType)
-        }
-        Returns: Table object
-        """
-
-        table = Table(table_name, self.metadata_obj)
-
-        for column in columns:
-            table.append_column(Column(column[0], column[1]))
-
-        for constraint in constraints:
-            table.append_constraint(constraint)
+class Words(Base):
+    __tablename__ = "words"
+    id = Column(Integer, primary_key=True)
+    word = Column(String)
+    syllable = Column(String)
+    sound = Column(String)
+    stress = Column(Integer)
+    
+    def __repr__(self):
+        return f"Words(id={self.id!r}, word={self.word!r}, syllable={self.syllable!r}, sound={self.sound!r}, stress={self.stress!r})"
 
 
-        self.metadata_obj.create_all(self._engine)
-        print(f"Created table {table_name}")
+def init():
+    global engine 
+    engine = create_engine("sqlite:///" + DB, echo=True, future=True)
+    Base.metadata.create_all(engine)
 
-        return table
+def add_word(w,syllables,sounds,stresses):
+    ## assert that they are all the same length 
 
-    def insert_into_table(self, table, values):
+    with Session(engine) as session:
+        load = []
+        for syll,sound,stress in zip(syllables,sounds,stresses):
+            entry  = Words(
+                word=w,
+                syllable=syll,
+                sound=sound,
+                stress=stress
+                )
+            load.append(entry)
+        session.add_all(load)
+        session.commit()
 
-        """
-        Inserts values into  a database table 
+    print(f"Successfully added {w} to database")
 
-        Params: {
-        table: Table
-        values: List of Ditcionaries with distinct parameters
-        }
-        """
-        conn = self._engine.connect()
-        ins = table.insert()
-        conn.execute(ins, values)
+def get_word(w):
+    res = {}
+    
+    words = []
+    with Session(engine) as session:
+        statement = (
+            select(Words)
+            .where(Words.word == w)
+            # .where(Words.stress > 0)
+            )
+        for word in session.scalars(statement):
+            d = {}
+            d["syllable"] = word.syllable
+            d["sound"]= word.sound
+            d["stress"] = word.stress
+            words.append(d)
+    res[w] = words
+    return res
 
-    def select_from_table(self, table, column = "all_columns"):
-        """
-        Selct rows from specified table 
+ 
+init()
 
-        Params: {
-        table: Table
-        columns: (optional) String specified column names. Default all columns 
-        }
-
-        Return: List of Row objects
-        """
-
-        conn = self._engine.connect()
-
-        if column == "all_columns":
-            s = select(table)
-            result = conn.execute(s)
-            return result
-
-        s = select(table.c[column])
-        result  = conn.execute(s)
-        return result
-
-
-syllable_db = SQLAlchemyDB("sqlite:///" + "bar.sqlite")
-syllable_table = syllable_db.create_table("syllables",[ ("word", String), ("pronunciation", String), ("syllables", String)], [UniqueConstraint("word")])
-for row in syllable_db.select_from_table(syllable_table):
-    print(row)

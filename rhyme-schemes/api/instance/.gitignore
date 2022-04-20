@@ -1,0 +1,6 @@
+*.yaml
+*.ipynb
+.ipynb_checkpoints
+.ipynb
+.yaml
+/scratch-work
