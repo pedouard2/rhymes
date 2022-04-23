@@ -1,8 +1,12 @@
-import yaml
-from pathlib import Path
-import requests
 import re
+from pathlib import Path
+
 import pronouncing
+import requests
+import yaml
+
+from .decorators import word_in_dictionary
+
 
 def get_credentials():
     full_file_path = Path(__file__).parent.parent.joinpath('instance/credentials.yaml')
@@ -15,7 +19,7 @@ credentials = get_credentials()
 pattern  = r"([AEIOU]+.{2})\s?"
 regex_pattern = re.compile(pattern)
 
-
+@word_in_dictionary
 def get_syllables(word, key = credentials["Dictionary"]["key"]):
 
     url = f"https://www.dictionaryapi.com/api/v3/references/collegiate/json/{word}?key={key}"
@@ -28,6 +32,8 @@ def get_syllables(word, key = credentials["Dictionary"]["key"]):
         r = r.json()
         return r[0]["hwi"]["hw"].split("*")
 
+@word_in_dictionary
 def get_sounds(word):
     pronounciation = pronouncing.phones_for_word(word)[0]
     return regex_pattern.findall(pronounciation), pronouncing.stresses(pronounciation)
+

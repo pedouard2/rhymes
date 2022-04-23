@@ -1,7 +1,8 @@
 import json
 from flask import Flask, request, jsonify
-from models import syllables, db
+from models import syllables, db, decorators
 from datetime import date, datetime
+import logging
 
 app = Flask(__name__)
 
@@ -15,8 +16,10 @@ def add_word():
     syl = syllables.get_syllables(w)
     sounds,stresses = syllables.get_sounds(w)
 
-    db.add_word(w,syl,sounds,stresses)
+    if len(syl) == 0:
+        return  jsonify({w:[{}]})
 
+    db.add_word(w,syl,sounds,stresses) 
     return jsonify(db.get_word(w))
 
 @app.route('/api/time')
