@@ -2,10 +2,39 @@
     color: black;
 }
 
-.s1{
+/* .s1{
     color: cyan;
-}
+} */
 
 .s0{
-    color: darkgray;
+    opacity: 1;
+    background-color: white;
+}
+
+.s2{
+    opacity: .5;
+}
+
+.ER1{
+    background-color: purple;
+}
+
+.AH0{
+    background-color: blue;
+}
+
+.IH1{
+    background-color: yellow;
+}
+
+.EY1{
+    background-color:tomato
+}
+
+.AE1{
+    background-color: thistle;
+}
+
+.EH1{
+    background-color: darksalmon;
 }

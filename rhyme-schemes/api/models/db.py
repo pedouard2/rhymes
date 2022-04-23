@@ -7,7 +7,15 @@ from sqlalchemy.orm import declarative_base, relationship, Session
 
 DB = "bar.db"
 
-Base = declarative_base()
+def init():
+    global engine 
+    global Base 
+    Base = declarative_base()
+    engine = create_engine("sqlite:///" + DB, echo=True, future=True)
+    Base.metadata.create_all(engine)
+
+init()
+
 
 class Sounds(Base):
     __tablename__ = "sounds"
@@ -29,10 +37,6 @@ class Words(Base):
         return f"Words(id={self.id!r}, word={self.word!r}, syllable={self.syllable!r}, sound={self.sound!r}, stress={self.stress!r})"
 
 
-def init():
-    global engine 
-    engine = create_engine("sqlite:///" + DB, echo=True, future=True)
-    Base.metadata.create_all(engine)
 
 def add_word(w,syllables,sounds,stresses):
     ## assert that they are all the same length 
@@ -72,5 +76,4 @@ def get_word(w):
     return res
 
  
-init()
 

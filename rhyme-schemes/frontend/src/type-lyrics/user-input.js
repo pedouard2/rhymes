@@ -1,13 +1,7 @@
-import { useEffect, useState, ChangeEvent, useMemo } from 'react';
-import TextField from '@mui/material/TextField';
-import Box from '@mui/material/Box';
+import { useRef, useEffect, useState, ChangeEvent, useMemo } from 'react';
 import './index.css';
 
-
-let changes = 1
 let words = {}
-
-
 
  const colorize =  async(arr) =>{
     let res = []
@@ -52,37 +46,30 @@ async function addWord(w) {
     
 }
 
-const UserInput = () => {
 
+
+
+const UserInput = () => {
+  
     const [userInput, setUserInput] = useState("")
-    const [mirroredText, setMirroredText] = useState([])
+    const [mirroredText, setMirroredText] = useState("")
 
     const handleChange = async (event: ChangeEvent<HTMLInputElement>) => {
-        let n = event.target.value.split(/\s+/).length
-
-        if (n !== changes){
-            let t = event.target.value.split(/\s+/)
-            
-            let v = await colorize(t)
-            setMirroredText(v)
-           }
-      
-        setUserInput(event.target.value);
-        changes = n
+            setUserInput(event.target.value);
+            setMirroredText(await colorize(event.target.value.split(/\s+/)))
         
       };
 
     return (  
         <div className='container'>
             <div className='row'>
-                <div className='col'>
-                    <TextField
-                    class="outlined-multiline-flexible col"
-                    multiline
-                    minRows={4}
+                <div className='col' >
+                    <textarea
+                    class="md-textarea form-control col"
+                    id="userInput"
                     value={userInput}
                     onChange={handleChange}/>
-                </div>
+                </div>  
                 <div className='col'>
                         {mirroredText}
                 </div>

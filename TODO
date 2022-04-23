@@ -1,0 +1,7 @@
+- Deal with duplicate words
+- Style the first page
+- Deal with stemming
+- Deal with words that do not appear in the dictionary 
+- Generate style sheet based on the syllable sounds
+    - BONUS: Api call to change colors
+- lmit to words in library
