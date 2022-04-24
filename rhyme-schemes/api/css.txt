@@ -1,20 +1,3 @@
-.word{
-    color: black;
-}
-
-textarea{
-    height:95%; 
-}
-
-.s0{
-    opacity: 1;
-    background-color: white !important;
-}
-
-.s2{
-    opacity: .5;
-}
-
 .OW2{background-color: HoneyDew }
 .OY1{background-color: CornflowerBlue }
 .UW1{background-color: NavajoWhite }

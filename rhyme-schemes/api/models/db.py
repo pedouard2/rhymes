@@ -4,31 +4,37 @@ from sqlalchemy.sql.expression import except_all
 import pandas as pd
 from sqlalchemy import create_engine, Table, Column, Integer, String, MetaData, select, UniqueConstraint, ForeignKey
 from sqlalchemy.orm import declarative_base, relationship, Session
+import random
 
 DB = "bar.db"
+COLORS = ["Aquamarine", "Coral", "CornflowerBlue", "DarkSeaGreen","DarkSlateBlue", "DarkSalmon", "HoneyDew", "LightSkyBlue", "LightYellow", "NavajoWhite", "Peru","Turquoise", "Tomato",  "YellowGreen", "SpringGreen" ]
+
+def rand_color(c):
+    i = random.randint(0,len(c)-1)
+    return c[i]
+
+
 
 def init():
     global engine 
     global Base 
     Base = declarative_base()
     engine = create_engine("sqlite:///" + DB, echo=True, future=True)
-    Base.metadata.create_all(engine)
 
 init()
 
 
-class Sounds(Base):
-    __tablename__ = "sounds"
-    sound = Column(String, primary_key = True, unique = True)
-    color = Column(String, unique = True)
-    
+class Lexicon(Base):
+    __tablename__ = "lexicon"
+    id = Column(Integer, primary_key=True)
+    word = Column(String,  unique = True)    
     def __repr__(self):
-        return f"Words(id={self.sound!r}, word={self.color!r})"
+        return f"Lexicon(word={self.word!r})"
 
 class Words(Base):
     __tablename__ = "words"
     id = Column(Integer, primary_key=True)
-    word = Column(String)
+    word = Column(String, ForeignKey("lexicon.word"))
     syllable = Column(String)
     sound = Column(String)
     stress = Column(Integer)
@@ -36,12 +42,21 @@ class Words(Base):
     def __repr__(self):
         return f"Words(id={self.id!r}, word={self.word!r}, syllable={self.syllable!r}, sound={self.sound!r}, stress={self.stress!r})"
 
+Base.metadata.create_all(engine)
 
 
 def add_word(w,syllables,sounds,stresses):
-    ## assert that they are all the same length 
 
     with Session(engine) as session:
+
+        try:
+            stmt = Lexicon(word =w)
+            session.add(stmt)
+            session.commit()
+        except:
+            print(f"{w} already in  database")
+            return
+
         load = []
         for syll,sound,stress in zip(syllables,sounds,stresses):
             entry  = Words(
@@ -64,7 +79,6 @@ def get_word(w):
         statement = (
             select(Words)
             .where(Words.word == w)
-            # .where(Words.stress > 0)
             )
         for word in session.scalars(statement):
             d = {}
@@ -75,5 +89,21 @@ def get_word(w):
     res[w] = words
     return res
 
- 
+def generate_css():
 
+    with open('css.txt', 'w') as f:
+        with Session(engine) as session:
+            statement = (
+                select(Words.sound)
+            )
+
+        for s in list(set(session.scalars(statement))):
+            f.write(
+
+                f".{s}{{background-color: {rand_color(COLORS)} }}"
+                f"\n"
+                
+
+            )
+
+generate_css()

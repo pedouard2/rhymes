@@ -3,7 +3,7 @@ import './index.css';
 
 let words = {}
 
- const colorize =  async(arr) =>{
+const colorize =  async(arr) =>{
     let res = []
     for(let  i = 0; i<arr.length; i++){
         let text = arr[i]
@@ -15,13 +15,19 @@ let words = {}
         if (text in words){
             w = words[text]
             values.push(w.map(item=> <span className={`${item.sound} s${item.stress}`} key={item.syllable}>{item.syllable}</span> ))
-        }else{
-           let result = await getWord(text) 
+        } else {
+           let result = await getWord(text)
+           
            if (result[text].length == 0) {
                result = await addWord(text)
            }
-           values.push(result[text].map(item=> <span className={`${item.sound} s${item.stress}`} key={item.syllable}>{item.syllable}</span> ))
-           words[text] = result[text]
+
+           if (result[text].length == 0){
+               values.push(<span>{text}</span>)
+           } else{
+            values.push(result[text].map(item=> <span className={`${item.sound} s${item.stress}`} key={item.syllable}>{item.syllable}</span> ))
+            words[text] = result[text]
+           }
            
         }        
         let v = await Promise.all(values)
@@ -67,6 +73,7 @@ const UserInput = () => {
                     <textarea
                     class="md-textarea form-control col"
                     id="userInput"
+                    rows={15}
                     value={userInput}
                     onChange={handleChange}/>
                 </div>  

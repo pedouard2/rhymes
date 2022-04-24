@@ -19,6 +19,9 @@ credentials = get_credentials()
 pattern  = r"([AEIOU]+.{2})\s?"
 regex_pattern = re.compile(pattern)
 
+def greedy_split(w,chunk):
+    return [w[i:i+chunk] for i in range(0,len(w),chunk)]
+
 @word_in_dictionary
 def get_syllables(word, key = credentials["Dictionary"]["key"]):
 
@@ -30,7 +33,14 @@ def get_syllables(word, key = credentials["Dictionary"]["key"]):
     
     if r.status_code == requests.codes.ok:
         r = r.json()
-        return r[0]["hwi"]["hw"].split("*")
+        try:
+            v = r[0]["hwi"]["hw"].split("*")
+            if "".join(v) == word:
+                return v
+            else:
+                return greedy_split(word,len(word)//pronouncing.syllable_count(pronouncing.phones_for_word(word)[0]))
+        except:
+            return []
 
 @word_in_dictionary
 def get_sounds(word):

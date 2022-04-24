@@ -17,7 +17,7 @@ def add_word():
     sounds,stresses = syllables.get_sounds(w)
 
     if len(syl) == 0:
-        return  jsonify({w:[{}]})
+        return  jsonify({w:[]})
 
     db.add_word(w,syl,sounds,stresses) 
     return jsonify(db.get_word(w))
