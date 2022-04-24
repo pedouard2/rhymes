@@ -8,4 +8,4 @@ This project is still in development. Functionality to edit word syllables and s
 
 ## Example:
 
-![Recording of webapp](/relative/path/to/img.jpg?raw=true "Optional Title")
+![Demo of Vizualization](rhymes.gif)
